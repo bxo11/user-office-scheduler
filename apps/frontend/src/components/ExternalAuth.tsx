@@ -99,15 +99,18 @@ function ExternalAuth() {
     );
 
     const handleAuthorizationCode = (authorizationCode: string) => {
-      const { protocol, host, pathname } = window.location;
+      const { protocol, host, pathname, search } = window.location;
       const currentUrlWithoutParams = [protocol, '//', host, pathname].join('');
+      const queryParams = new URLSearchParams(search);
 
+      const iss = queryParams.get('iss');
       setView(<ContactingAuthorizationServerMessage />);
 
       unauthorizedApi()
         .externalTokenLogin({
           externalToken: authorizationCode,
           redirectUri: currentUrlWithoutParams,
+          iss: iss,
         })
         .then(({ externalTokenLogin }) => {
           handleLogin(externalTokenLogin);

@@ -406,6 +406,7 @@ export type EmailStatusActionRecipient = {
 
 export enum EmailStatusActionRecipients {
   CO_PROPOSERS = 'CO_PROPOSERS',
+  FAP_CHAIR_AND_SECRETARY = 'FAP_CHAIR_AND_SECRETARY',
   FAP_REVIEWERS = 'FAP_REVIEWERS',
   INSTRUMENT_SCIENTISTS = 'INSTRUMENT_SCIENTISTS',
   OTHER = 'OTHER',
@@ -604,8 +605,8 @@ export type Fap = {
   description: Scalars['String']['output'];
   fapChair: Maybe<BasicUserDetails>;
   fapChairProposalCount: Maybe<Scalars['Int']['output']>;
-  fapSecretary: Maybe<BasicUserDetails>;
-  fapSecretaryProposalCount: Maybe<Scalars['Int']['output']>;
+  fapSecretaries: Array<BasicUserDetails>;
+  fapSecretariesProposalCounts: Array<FapProposalCount>;
   gradeGuide: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
   numberRatingsRequired: Scalars['Float']['output'];
@@ -646,9 +647,15 @@ export type FapProposal = {
   proposalPk: Scalars['Int']['output'];
 };
 
+export type FapProposalCount = {
+  count: Scalars['Int']['output'];
+  userId: Scalars['Int']['output'];
+};
+
 export type FapReviewer = {
   fapId: Scalars['Int']['output'];
   proposalsCount: Scalars['Int']['output'];
+  proposalsCountByCall: Scalars['Int']['output'];
   role: Maybe<Role>;
   user: BasicUserDetails;
   userId: Scalars['Int']['output'];
@@ -762,6 +769,7 @@ export type FileMetadata = {
 export type FileUploadConfig = {
   file_type: Array<Scalars['String']['output']>;
   max_files: Scalars['Int']['output'];
+  omitFromPdf: Scalars['Boolean']['output'];
   pdf_page_limit: Scalars['Int']['output'];
   required: Scalars['Boolean']['output'];
   small_label: Scalars['String']['output'];
@@ -4110,6 +4118,7 @@ export type BasicUserDetailsFragment = { id: number, firstname: string, lastname
 export type ExternalTokenLoginMutationVariables = Exact<{
   externalToken: Scalars['String']['input'];
   redirectUri: Scalars['String']['input'];
+  iss?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -4776,8 +4785,12 @@ export const UpdateScheduledEventDocument = gql`
 }
     ${BasicUserDetailsFragmentDoc}`;
 export const ExternalTokenLoginDocument = gql`
-    mutation externalTokenLogin($externalToken: String!, $redirectUri: String!) {
-  externalTokenLogin(externalToken: $externalToken, redirectUri: $redirectUri)
+    mutation externalTokenLogin($externalToken: String!, $redirectUri: String!, $iss: String) {
+  externalTokenLogin(
+    externalToken: $externalToken
+    redirectUri: $redirectUri
+    iss: $iss
+  )
 }
     `;
 export const GetMyRolesDocument = gql`
